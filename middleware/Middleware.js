@@ -1,8 +1,10 @@
 const jwt = require('jsonwebtoken')
 const z =require('zod')
+const User = require('../models/UserModel');
 require('dotenv').config()
+
 const userSchema = z.object({
-    username: z.string().min(3, "Username must be at least 3 characters long"),
+    name: z.string().min(3, "Username must be at least 3 characters long"),
     password: z.string().min(8, "Password must be at least 8 characters long"),
     email: z.string().email("Invalid email format"),
     preferences: z.object({
@@ -22,8 +24,8 @@ const userSchema = z.object({
   }
   
 async function checkdbforexistinguser(req,res,next){
-    const user=req.body.name;
-    const Finduser=await User.findOne({username:user});
+    const email=req.body.email;
+    const Finduser=await User.findOne({email:email});
     if(Finduser){
         return res.status(400).send('User already exists!Please go to the login page');
     }
@@ -31,7 +33,7 @@ async function checkdbforexistinguser(req,res,next){
 }
 
 
-async function verifyjwt(req, res, next) {
+async function verifyJwt(req, res, next) {
     const authHeader = req.header('Authorization');
     if (!authHeader) {
         return res.status(401).send('Token cannot be empty');
@@ -53,4 +55,4 @@ async function verifyjwt(req, res, next) {
 
 }
 
-module.exports={verifyjwt,zodValidator,checkdbforexistinguser};
+module.exports={verifyJwt,zodValidator,checkdbforexistinguser};

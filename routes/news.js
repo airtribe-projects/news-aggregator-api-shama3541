@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { verifyjwt } = require('../middleware/Middleware'); // Ensure correct path
+const { verifyJwt } = require('../middleware/Middleware'); // Ensure correct path
 const {getNews} = require('../controller/User');
 
 
-router.get('/',verifyjwt,getNews)
+router.get('/',verifyJwt,getNews)
 
 module.exports = router;
