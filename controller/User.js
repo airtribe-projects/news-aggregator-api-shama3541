@@ -77,9 +77,9 @@ async function getNews(req, res) {
   try{
     // const Findpreference=await User.findOne({username:user})
     // const preference=Findpreference.preference;
-    const news = await axios.get(`https://newsapi.org/v2/everything?q=bitcoin&language=it&apiKey=${process.env.NEWSAPI_APIKEY}`)
-    res.json({ news: news.data.articles })
-  }catch{
+    const news = await axios.get(`https://newsapi.org/v2/everything?q=bitcoin&apiKey=${process.env.NEWSAPI_APIKEY}`)
+    res.json({ news: news.data })
+  }catch(err){
     console.log(err)
     return res.status(500).send('An error occurred');
   }

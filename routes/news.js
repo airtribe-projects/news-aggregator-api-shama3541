@@ -1,9 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const { verifyJwt } = require('../middleware/Middleware'); // Ensure correct path
-const {getNews} = require('../controller/User');
+const {getNews,markAsRead,markAsFavourite,getFavourites,getRead} = require('../controller/News');
 
 
-router.get('/',verifyJwt,getNews)
+router.post('/',verifyJwt,getNews)
+router.post('/:id/read',verifyJwt,markAsRead)
+router.post('/:id/favourite',verifyJwt,markAsFavourite)
+router.get('/favourites',verifyJwt,getFavourites)
+router.get('/read',verifyJwt,getRead) 
 
 module.exports = router;
