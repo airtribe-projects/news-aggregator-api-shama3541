@@ -101,6 +101,8 @@ news-aggregator-api/
 ├── controllers/
 │   ├── usersController.js       # Handles user authentication and preferences
 │   ├── newsController.js        # Handles news fetching and management
+|── jobs/
+|   |──Cronjobs.js               #refreshes the db everyhour
 ├── middlewares/
 │   ├── authorization.js         # JWT-based authentication middleware
 ├── models/

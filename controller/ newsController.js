@@ -2,7 +2,7 @@ require("dotenv").config();
 const crypto = require("crypto");
 const axios = require("axios");
 const News = require("../models/NewsModel");
-const {getUserPreferences} = require("./User");
+const {getUserPreferences} = require("./userController");
 require ("../jobs/Cronjob");
 
 function generateUniqueId(name) {
@@ -12,11 +12,7 @@ function generateUniqueId(name) {
 
 
 async function getNews(req, res) {
-    const email = req.user.email;
-    console.log(email);
   try {
-    const preferences = await getUserPreferences(email);
-    console.log(preferences);
     const existingNews = await News.find({
       cachedAt: { $gte: new Date(Date.now() - 3600 * 1000) },
     })

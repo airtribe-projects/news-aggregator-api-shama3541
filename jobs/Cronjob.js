@@ -1,5 +1,5 @@
 
-const {getNews} = require("../controller/News");
+const {getNews} = require("../controller/ newsController");
 const cron = require('node-cron');
 
 

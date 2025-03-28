@@ -8,7 +8,7 @@ const {
   getFavourites,
   getRead,
   searchNews
-} = require("../controller/News");
+} = require("../controller/ newsController");
 
 router.post("/", verifyJwt, getNews);
 router.post("/:id/read", verifyJwt, markAsRead);
