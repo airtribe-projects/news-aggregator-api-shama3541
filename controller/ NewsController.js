@@ -1,7 +1,10 @@
 require("dotenv").config();
+const NodeCache = require("node-cache");
 const crypto = require("crypto");
 const axios = require("axios");
 const News = require("../models/NewsModel");
+const User = require("../models/UserModel");
+const newsCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
 require("../jobs/CronJob");
 const NEWSAPI_KEY = process.env.NEWSAPI_APIKEY;
 
@@ -13,56 +16,45 @@ function generateUniqueId(name) {
 
 async function getNews(req, res) {
   try {
-    const existingNews = await News.find({
-      description: { $regex: "bitcoin", $options: "i" },
-      cachedAt: { $gte: new Date(Date.now() - 3600 * 1000) }
-    })
-      .sort({ publishedAt: -1 })
-      .limit(20)
-      .select("source.id title url publishedAt author description urlToImage");
-
-    if (existingNews.length > 0 && existingNews.length < 10) {
-      console.log("Fetching from Cache...");
-      return res.json({ news: existingNews });
-    }
-
-    console.log("Fetching from API...");
+    const email = req.user.email;
+    const Findpreference = await User.findOne({ email: email })
+    console.log(Findpreference.preferences)
     
+  for (let i = 0; i < Findpreference.preferences.length; i++) {
+    const cachedNews = newsCache.get(Findpreference.preferences[i]);
+    if (cachedNews) {
+      console.log("Fetching from Cache...");
+      return res.json({ news: cachedNews });
+    }
+  }
+
+   
     const newsResponse = await axios.get("https://newsapi.org/v2/everything", {
       params: {
-          q: "bitcoin",
+        q: Findpreference.preferences[1], 
+        sortBy: "publishedAt",
+        pageSize: 20,
       },
       headers: {
-          "X-Api-Key": NEWSAPI_KEY,
-      }
-   });
-
-    const articles = newsResponse.data.articles;
-    const updateid = articles.map((article, index) => {
-      article.source.id = generateUniqueId(article.source.name);
+        "X-Api-Key": NEWSAPI_KEY,
+      },
     });
 
-    const bulkOps = articles.map((article) => ({
-      updateOne: {
-        filter: { url: article.url },
-        update: {
-          $set: {
-            ...article,
-            cachedAt: new Date(),
-          }, 
-        },
-        upsert: true,
-      },
+    const articles = newsResponse.data.articles.map((article) => ({
+      source: { id: generateUniqueId(article.source.name) },
+      title: article.title,
+      url: article.url,
+      publishedAt: article.publishedAt,
+      author: article.author,
+      description: article.description,
+      urlToImage: article.urlToImage,
     }));
 
-    await News.bulkWrite(bulkOps);
+    // Store in cache
+    Findpreference.preferences.map((preference)=>newsCache.set(preference, articles));
 
-    const updatedNews = await News.find()
-      .sort({ publishedAt: -1 })
-      .limit(20)
-      .select("source.id title url publishedAt author description urlToImage");
-
-    res.json({ news: updatedNews });
+    console.log("Fetching from API...");
+    return res.json({ news: articles });
   } catch (err) {
     console.error(err);
     return res.status(500).send("An error occurred");
