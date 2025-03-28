@@ -2,17 +2,21 @@ require("dotenv").config();
 const crypto = require("crypto");
 const axios = require("axios");
 const News = require("../models/NewsModel");
-const cron = require("node-cron");
+const {getUserPreferences} = require("./User");
+require ("../jobs/Cronjob");
 
-cron.schedule("* * * * * *",() => {console.log("Running a task every second");});
+function generateUniqueId(name) {
+    return crypto.createHash("md5").update(name).digest("hex").slice(0, 8);
+}
 
-const generateUniqueId = (name) => {
-  return crypto.createHash("md5").update(name).digest("hex").slice(0, 8);
-};
 
 
 async function getNews(req, res) {
+    const email = req.user.email;
+    console.log(email);
   try {
+    const preferences = await getUserPreferences(email);
+    console.log(preferences);
     const existingNews = await News.find({
       cachedAt: { $gte: new Date(Date.now() - 3600 * 1000) },
     })
@@ -27,7 +31,7 @@ async function getNews(req, res) {
 
     console.log("Fetching from API...");
     const newsResponse = await axios.get(
-      `https://newsapi.org/v2/everything?q=horror&apiKey=${process.env.NEWSAPI_APIKEY}`
+      `https://newsapi.org/v2/everything?q="bitcoin"&apiKey=${process.env.NEWSAPI_APIKEY}`
     );
 
     const articles = newsResponse.data.articles;
@@ -42,7 +46,7 @@ async function getNews(req, res) {
           $set: {
             ...article,
             cachedAt: new Date(),
-          }, // Ensures "source.id" is correctly set
+          }, 
         },
         upsert: true,
       },
@@ -124,10 +128,35 @@ async function getRead(req, res) {
   }
 }
 
+
+async function searchNews(req, res) {
+  const query = req.params.keyword
+  try {
+    const news = await News.find({title: { $regex: query, $options: "i" }} )
+      .sort({ publishedAt: -1 })
+      .limit(20)
+      .select("source.id title url publishedAt author description urlToImage");
+    if(news.length > 0){
+      return  res.json({ news });
+    }
+    const Latestnews= await axios.get(
+        `https://newsapi.org/v2/everything?q="${query}"&apiKey=${process.env.NEWSAPI_APIKEY}`
+      );
+        const articles = Latestnews.data.articles;
+        return res.json({ news: articles });
+    
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send("An error occurred");
+  }
+}
+
 module.exports = {
   getNews,
   markAsRead,
   getFavourites,
   getRead,
   markAsFavourite,
+  generateUniqueId,
+  searchNews
 };
