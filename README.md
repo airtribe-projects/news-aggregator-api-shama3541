@@ -99,18 +99,18 @@ npm test
 ```
 news-aggregator-api/
 ├── controllers/
-│   ├── usersController.js       # Handles user authentication and preferences
-│   ├── newsController.js        # Handles news fetching and management
+│   ├── UsersController.js       # Handles user authentication and preferences
+│   ├── NewsController.js        # Handles news fetching and management
 |── jobs/
-|   |──Cronjobs.js               #refreshes the db everyhour
+|   |──CronJobs.js               #refreshes the db everyhour
 ├── middlewares/
-│   ├── authorization.js         # JWT-based authentication middleware
+│   ├── Middleware.js         # JWT-based authentication middleware
 ├── models/
-│   ├── userModel.js             # MongoDB schema for users
-│   ├── newsModel.js             # MongoDB schema for news caching
+│   ├── UserModel.js             # MongoDB schema for users
+│   ├── NewsModel.js             # MongoDB schema for news caching
 ├── routes/
-│   ├── usersRouter.js           # User-related API routes
-│   ├── newsRouter.js            # News-related API routes
+│   ├── UsersRouter.js           # User-related API routes
+│   ├── NewsRouter.js            # News-related API routes
 ├── test/
 │   ├── server.test.js           # Test cases for API endpoints
 ├── app.js                       # Main application file
