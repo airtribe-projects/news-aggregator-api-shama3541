@@ -159,6 +159,6 @@ cron.schedule("0 * * * *", async () => {
 
 ## Author
 
-Developed by **[Your Name]** 🚀
+Developed by **Shamadeep** 🚀
 
 
