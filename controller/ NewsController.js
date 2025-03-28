@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const axios = require("axios");
 const News = require("../models/NewsModel");
 require("../jobs/CronJob");
+const NEWSAPI_KEY = process.env.NEWSAPI_APIKEY;
 
 function generateUniqueId(name) {
     return crypto.createHash("md5").update(name).digest("hex").slice(0, 8);
@@ -13,21 +14,28 @@ function generateUniqueId(name) {
 async function getNews(req, res) {
   try {
     const existingNews = await News.find({
-      cachedAt: { $gte: new Date(Date.now() - 3600 * 1000) },
+      description: { $regex: "bitcoin", $options: "i" },
+      cachedAt: { $gte: new Date(Date.now() - 3600 * 1000) }
     })
       .sort({ publishedAt: -1 })
       .limit(20)
       .select("source.id title url publishedAt author description urlToImage");
 
-    if (existingNews.length > 0) {
+    if (existingNews.length > 0 && existingNews.length < 10) {
       console.log("Fetching from Cache...");
       return res.json({ news: existingNews });
     }
 
     console.log("Fetching from API...");
-    const newsResponse = await axios.get(
-      `https://newsapi.org/v2/everything?q="bitcoin"&apiKey=${process.env.NEWSAPI_APIKEY}`
-    );
+    
+    const newsResponse = await axios.get("https://newsapi.org/v2/everything", {
+      params: {
+          q: "bitcoin",
+      },
+      headers: {
+          "X-Api-Key": NEWSAPI_KEY,
+      }
+   });
 
     const articles = newsResponse.data.articles;
     const updateid = articles.map((article, index) => {
@@ -134,9 +142,14 @@ async function searchNews(req, res) {
     if(news.length > 0){
       return  res.json({ news });
     }
-    const Latestnews= await axios.get(
-        `https://newsapi.org/v2/everything?q="${query}"&apiKey=${process.env.NEWSAPI_APIKEY}`
-      );
+    const Latestnews= await await axios.get("https://newsapi.org/v2/everything", {
+      params: {
+          q: query,
+      },
+      headers: {
+          "X-Api-Key": NEWSAPI_KEY,
+      }
+   });
         const articles = Latestnews.data.articles;
         return res.json({ news: articles });
     
