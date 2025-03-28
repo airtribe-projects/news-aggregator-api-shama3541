@@ -10,7 +10,7 @@ const {
   loginUser,
   getUserPreferences,
   updateUserPreferences,
-} = require("../controller/userController"); 
+} = require("../controller/UserController"); 
 
 router.post("/signup", zodValidator, checkdbforexistinguser, registerUser);
 router.post("/login", zodValidator, loginUser);

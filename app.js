@@ -1,8 +1,8 @@
 const express = require("express");
 const app = express();
 require("dotenv").config();
-const router = require("./routes/Routes");
-const newsRoute = require("./routes/news");
+const router = require("./routes/UserRoutes");
+const newsRoute = require("./routes/NewsRoutes");
 const mongoose = require("mongoose");
 const port = 3000;
 

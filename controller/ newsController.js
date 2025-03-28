@@ -2,8 +2,7 @@ require("dotenv").config();
 const crypto = require("crypto");
 const axios = require("axios");
 const News = require("../models/NewsModel");
-const {getUserPreferences} = require("./userController");
-require ("../jobs/Cronjob");
+require("../jobs/CronJob");
 
 function generateUniqueId(name) {
     return crypto.createHash("md5").update(name).digest("hex").slice(0, 8);
