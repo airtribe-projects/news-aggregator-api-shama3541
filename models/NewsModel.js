@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { any } = require("zod");
 const NewsSchema = new mongoose.Schema({
   source: {
     id: { type: mongoose.Schema.Types.Mixed, default: null },

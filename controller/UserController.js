@@ -4,9 +4,9 @@ const jwt = require("jsonwebtoken");
 const saltRounds = 10;
 const axios = require("axios");
 const User = require("../models/UserModel");
+const NEWSAPI_KEY = process.env.NEWSAPI_APIKEY;
 
 async function registerUser(req, res) {
-  // Debugging log
   const username = req.body.name;
   const password = req.body.password;
   const email = req.body.email;
@@ -34,11 +34,11 @@ async function registerUser(req, res) {
 async function loginUser(req, res) {
   const email = req.body.email;
   const password = req.body.password;
-  const Finduser = await User.findOne({ email: email });
-  if (!Finduser) {
+  const foundUser = await User.findOne({ email: email });
+  if (!foundUser) {
     return res.status(400).send("User not found");
   }
-  const match = await bcrypt.compare(password, Finduser.password);
+  const match = await bcrypt.compare(password, foundUser.password);
   if (match) {
     const token = jwt.sign({ email: email }, process.env.JWTSECRETKEY);
     return res.json({ token: token });
@@ -50,8 +50,8 @@ async function loginUser(req, res) {
 async function getUserPreferences(req, res) {
   const email = req.user.email;
   try {
-    const Findpreference = await User.findOne({ email: email });
-    return res.json({ preferences: Findpreference.preferences });
+    const foundPreference = await User.findOne({ email: email });
+    return res.json({ preferences: foundPreference.preferences });
   } catch (err) {
     console.log(err);
     return res.status(500).send("An error occurred");
@@ -63,7 +63,7 @@ async function updateUserPreferences(req, res) {
   const newpreferences = req.body.preferences;
 
   try {
-    const updateUserPreferences = await User.findOneAndUpdate(
+    const updatedUserPreferences = await User.findOneAndUpdate(
       { email: email },
       { preferences: newpreferences }
     );

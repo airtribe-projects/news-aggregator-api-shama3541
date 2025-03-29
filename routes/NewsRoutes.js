@@ -7,14 +7,14 @@ const {
   markAsFavourite,
   getFavourites,
   getRead,
-  searchNews
-} = require("../controller/ NewsController");
+  searchNews,
+} = require("../controller/NewsController");
 
 router.post("/", verifyJwt, getNews);
 router.post("/:id/read", verifyJwt, markAsRead);
 router.post("/:id/favourite", verifyJwt, markAsFavourite);
 router.get("/favourites", verifyJwt, getFavourites);
 router.get("/read", verifyJwt, getRead);
-router.get("/search/:keyword",verifyJwt, searchNews);
+router.get("/search/:keyword", verifyJwt, searchNews);
 
 module.exports = router;

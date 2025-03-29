@@ -14,9 +14,8 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   preferences: {
-    type: [String], // Array of strings
-    default: ["movies", "comics"], // Default values
-    required: true,
+    type: [String], 
+    default: ["movies", "comics"],
   },
 });
 

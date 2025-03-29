@@ -18,9 +18,10 @@ app.use("/news", newsRoute);
 
 app.listen(port, (err) => {
   if (err) {
-    return console.log("Something bad happened", err);
+    return console.log(`Something bad happened: ${err}`);
   }
   console.log(`Server is listening on ${port}`);
 });
 
 module.exports = app;
+
